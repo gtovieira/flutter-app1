@@ -48,7 +48,7 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
   TextEditingController cityController = TextEditingController();
   TextEditingController ufController = TextEditingController();
 
-  final _formKey = GlobalKey<FormState>();
+  final _formCadClienteKey = GlobalKey<FormState>();
   bool _cepValidated = false;
 
   void fetchCep() async {
@@ -96,13 +96,13 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
             const Expanded(flex: 2, child: Text('Adicionar Cliente')),
             IconButton(
                 onPressed: () {
-                  _formKey.currentState!.reset();
+                  _formCadClienteKey.currentState!.reset();
                 },
                 icon: const Icon(Icons.backspace)),
             IconButton(
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
+                  if (_formCadClienteKey.currentState!.validate()) {
+                    _formCadClienteKey.currentState!.save();
                     Navigator.push(context, MaterialPageRoute(builder: (_) {
                       return PgClienteCadastrado();
                     }));
@@ -117,14 +117,16 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Form(
-            key: _formKey,
-            autovalidateMode: AutovalidateMode.always,
+            key: _formCadClienteKey,
+            // autovalidateMode: AutovalidateMode.always,
             child: ListView(children: [
               Wrap(
-                runSpacing: 20,
+                runSpacing: 30,
                 children: <Widget>[
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'Nome Completo'),
+                    decoration: InputDecoration(
+                      labelText: 'Nome Completo',
+                    ),
                   ),
                   TextFormField(
                     decoration: InputDecoration(labelText: 'Código do Projeto'),
@@ -147,22 +149,47 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                         InputDecoration(labelText: 'Data de Nascimento'),
                     inputFormatters: [dobMask],
                   ),
+                  TextFormField(
+                    decoration: InputDecoration(labelText: 'E-mail'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Campo obrigatório';
+                      } else if (RegexCodes.email.hasMatch(value)) {
+                        return null;
+                      } else {
+                        return 'Digite um e-mail válido';
+                      }
+                    },
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(labelText: 'Telefone Celular'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Campo Obrigatório';
+                      } else if (RegexCodes.phone.hasMatch(value)) {
+                        return null;
+                      } else {
+                        return 'Digite um número válido';
+                      }
+                    },
+                  ),
                   Focus(
                     child: TextFormField(
                       decoration: InputDecoration(labelText: 'CEP'),
                       inputFormatters: [cepMask],
                       controller: cepController,
                       validator: (value) {
-                        if (value != null && RegexCodes.cep.hasMatch(value)) {
-                          _cepValidated = true;
-                          return null;
-                        } else if (value == null) {
+                        if (value == null || value.isEmpty) {
                           _cepValidated = false;
                           _clearAddressFields();
                           return 'Campo Obrigatório';
+                        } else if (RegexCodes.cep.hasMatch(value)) {
+                          _cepValidated = true;
+                          return null;
                         } else {
                           _cepValidated = false;
                           _clearAddressFields();
+                          print(value);
                           return 'Digite um CEP válido';
                         }
                       },
@@ -180,7 +207,7 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                   TextFormField(
                     decoration: InputDecoration(labelText: 'Número'),
                     validator: (value) {
-                      if (value == null) {
+                      if (value == null || value.isEmpty) {
                         return 'Campo Obrigatório';
                       } else {
                         return null;
