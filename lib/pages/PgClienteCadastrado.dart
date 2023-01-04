@@ -15,11 +15,11 @@ class PgClienteCadastrado extends StatelessWidget {
               const Expanded(flex: 2, child: Text('Gauss Energia')),
             ],
           ),
-          backgroundColor: Colors.green,
         ),
         body: Center(
             child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: const Text('Cliente Cadastrado com Sucesso!'))));
   }
 }

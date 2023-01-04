@@ -128,7 +128,7 @@
     "helperStyle": { "fontSize": 18 },
     "contentPadding": { "vertical": 15 },
     "alignLabelWithHint": false,
-    "filled": true,
+    "filled": false,
     "floatingLabelAlignment": "start",
     "floatingLabelBehavior": "auto",
     "isCollapsed": false,

@@ -10,11 +10,20 @@ class PgCadastroProjeto extends StatefulWidget {
 }
 
 class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
+  final _formCadProjKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Cadastro de Projeto')),
-      body: const Center(child: Text('Cadastro de Projetos'))
-    );
+        appBar: AppBar(title: Text('Cadastro de Projeto')),
+        body: Center(
+            child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                child: Form(
+                    key: _formCadProjKey,
+                    // autovalidateMode: AutovalidateMode.always,
+                    child: ListView(children: [
+                      Wrap(runSpacing: 30, children: <Widget>[TextFormField()])
+                    ])))));
   }
 }
