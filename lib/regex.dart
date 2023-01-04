@@ -20,7 +20,7 @@ class RegexCodes {
   static final cod = RegExp(r'^[\d]*$');
 
   static final dob = RegExp(r'.*');
-  static final cep = RegExp(r'.*');
+  static final cep = RegExp(r'^[\d]{2}[.][\d]{3}-[\d]{3}$');
   static final address = RegExp(r'.*');
   static final number = RegExp(r'.*');
   static final city = RegExp(r'.*');

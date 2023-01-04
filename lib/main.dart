@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
-import './pgCadastroCliente.dart';
+import './pages/PgTabelas.dart';
+import './pages/PgVisitaTecnica.dart';
+import './pages/PgEnvioDocs.dart';
+import './pages/PgEstoque.dart';
+import './pages/PgConsultaProjeto.dart';
+import './pages/PgConsultaCliente.dart';
+import './pages/PgProposta.dart';
+import './pages/PgCadastroProjeto.dart';
+import './pages/PgMainButtons.dart';
+import './pages/PgCadastroCliente.dart';
 import 'package:json_theme/json_theme.dart';
 
 import 'package:flutter/services.dart'; // For rootBundle
 import 'dart:convert'; // For jsonDecode
+
+//TOdo
+//Implement buttons in the main page
+
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +37,20 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: theme,
-      home: const PgCadastroCliente(),
+      // home: const PgMainButtons(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const PgMainButtons(),
+        '/proposta': (context) => const PgProposta(),
+        '/cadastro-cliente': (context) => const PgCadastroCliente(),
+        '/cadastro-projeto':(context) => const PgCadastroProjeto(),
+        '/consulta-cliente':(context) => const PgConsultaCliente(),
+        '/consulta-projeto':(context) => const PgConsultaProjeto(),
+        '/visita-tecnica':(context) => const PgVisitaTecnica(),
+        '/estoque':(context) => const PgEstoque(),
+        '/envio-documentos':(context) => const PgEnvioDocs(),
+        '/tabelas':(context) => const PgTabelas(),
+      },
     );
   }
 }
