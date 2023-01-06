@@ -10,7 +10,8 @@ class ApiCalls {
     return http.get(url);
   }
 
-  // static const Map<String, String> cepErrors {
-  //   '422': 'f';
-  // }
+  static Future fetchCnpj ({required int cnpj}) {
+    var url = Uri.https(_baseInvertexto, 'v1/cnpj/$cnpj', {'token': _tokenInvertexto});
+    return http.get(url);
+  }
 }

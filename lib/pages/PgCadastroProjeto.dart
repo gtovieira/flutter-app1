@@ -2,6 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
+const List<String> vendors = [
+  'Gabriel Vieira',
+  'João Mateus',
+  'Dimitri Sampaio',
+  'Joaquim Neto',
+  'Janicleia Carvalho',
+  'Ângelo Dourado',
+  'Lucas Rizzaro',
+  'Aílton Júnior',
+  'Wildiney Lunas',
+  'Edilan Barreto',
+  'Vinicius Marambaia',
+  'Fernanda Martins',
+  'Raniel Garcia',
+  'Ricardo Sanches'
+];
+
 class PgCadastroProjeto extends StatefulWidget {
   const PgCadastroProjeto({super.key});
 
@@ -10,6 +27,7 @@ class PgCadastroProjeto extends StatefulWidget {
 }
 
 class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
+  late String selectedVendor;
   final _formCadProjKey = GlobalKey<FormState>();
 
   @override
@@ -23,7 +41,19 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
                     key: _formCadProjKey,
                     // autovalidateMode: AutovalidateMode.always,
                     child: ListView(children: [
-                      Wrap(runSpacing: 30, children: <Widget>[TextFormField()])
+                      Wrap(runSpacing: 30, children: <Widget>[
+                        DropdownButtonFormField(
+                            decoration: InputDecoration(labelText: 'Vendedor'),
+                            items: vendors
+                                .map((e) =>
+                                    DropdownMenuItem(value: e, child: Text(e)))
+                                .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedVendor = value!;
+                              });
+                            })
+                      ])
                     ])))));
   }
 }

@@ -47,20 +47,42 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
   TextEditingController bairroController = TextEditingController();
   TextEditingController cityController = TextEditingController();
   TextEditingController ufController = TextEditingController();
+  TextEditingController cnpjController = TextEditingController();
+  TextEditingController razaoController = TextEditingController();
+  TextEditingController fantasiaController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController numeroController = TextEditingController();
+  TextEditingController tipoLogController = TextEditingController();
 
   final _formCadClienteKey = GlobalKey<FormState>();
   bool _cepValidated = false;
 
   void fetchCep() async {
     Map response;
+    print(cepMask.getUnmaskedText());
     ApiCalls.fetchCep(cep: int.parse(cepMask.getUnmaskedText())).then((value) {
       response = jsonDecode(value.body);
+      print(response['street']);
       setState(() {
         logController.text = response['street'];
         bairroController.text = response['neighborhood'];
         cityController.text = response['city'];
         ufController.text = response['state'];
       });
+    });
+  }
+
+  void fetchCnpj() async {
+    dynamic response;
+    Map body;
+    response =
+        await ApiCalls.fetchCnpj(cnpj: int.parse(cnpjMask.getUnmaskedText()));
+    body = await jsonDecode(response.body);
+    setState(() {
+      razaoController.text = body['razao_social'];
+      fantasiaController.text = body['nome_fantasia'] ??= '';
+      // print(body['endereco']['cep'].runtimeType);
+      cepController.text = cepMask.maskText(body['endereco']['cep']);
     });
   }
 
@@ -76,6 +98,11 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
       filter: {'#': RegExp(r'[0-9]')},
       type: MaskAutoCompletionType.lazy);
 
+  var cnpjMask = MaskTextInputFormatter(
+      mask: '##.###.###/####-##',
+      filter: {'#': RegExp(r'[0-9]')},
+      type: MaskAutoCompletionType.lazy);
+
   var dobMask = MaskTextInputFormatter(
       mask: '##/##/####',
       filter: {'#': RegExp(r'[0-9]')},
@@ -85,6 +112,12 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
       mask: '##.###-###',
       filter: {'#': RegExp(r'[0-9]')},
       type: MaskAutoCompletionType.lazy);
+
+  static const List<Widget> pfPjList = [
+    Text('Pessoa Física'),
+    Text('Pessoa Jurídica')
+  ];
+  final List<bool> _pfPjSelected = [false, false];
 
   @override
   Widget build(BuildContext context) {
@@ -115,21 +148,64 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
       ),
       body: Center(
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
           child: Form(
             key: _formCadClienteKey,
-            // autovalidateMode: AutovalidateMode.always,
+            autovalidateMode: AutovalidateMode.always,
             child: ListView(children: [
               Wrap(
                 runSpacing: 30,
                 children: <Widget>[
-                  TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Nome Completo',
+                  Center(
+                    child: ToggleButtons(
+                      isSelected: _pfPjSelected,
+                      onPressed: (index) {
+                        setState(() {
+                          for (int i = 0; i < _pfPjSelected.length; i++) {
+                            _pfPjSelected[i] = i == index;
+                          }
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      fillColor: Color.fromARGB(255, 91, 161, 87),
+                      color: Color.fromARGB(255, 91, 161, 87),
+                      selectedColor: Colors.white,
+                      textStyle: TextStyle(fontSize: 20),
+                      constraints: BoxConstraints(minHeight: 50, minWidth: 180),
+                      children: pfPjList,
                     ),
                   ),
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'Código do Projeto'),
+                    decoration:
+                        const InputDecoration(labelText: 'Código do Projeto'),
+                  ),
+                  _pfPjSelected[1]
+                      ? TextFormField(
+                          decoration: InputDecoration(labelText: 'CNPJ'),
+                          inputFormatters: [cnpjMask],
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Campo Obrigatório';
+                            } else if (!RegexCodes.cnpj.hasMatch(value)) {
+                              return 'CNPJ inválido';
+                            } else {
+                              fetchCnpj();
+                              return null;
+                            }
+                          },
+                        )
+                      : SizedBox.shrink(),
+                  _pfPjSelected[1]
+                      ? TextFormField(
+                          decoration:
+                              InputDecoration(labelText: 'Razão Social'),
+                          controller: razaoController,
+                        )
+                      : SizedBox.shrink(),
+                  TextFormField(
+                    decoration: _pfPjSelected[1]
+                        ? InputDecoration(labelText: 'Nome do Responsável')
+                        : InputDecoration(labelText: 'Nome Completo'),
                   ),
                   TextFormField(
                     decoration: InputDecoration(labelText: 'CPF'),
@@ -189,7 +265,6 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                         } else {
                           _cepValidated = false;
                           _clearAddressFields();
-                          print(value);
                           return 'Digite um CEP válido';
                         }
                       },
