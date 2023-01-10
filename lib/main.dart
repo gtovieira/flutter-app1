@@ -10,6 +10,8 @@ import './pages/PgCadastroProjeto.dart';
 import './pages/PgMainButtons.dart';
 import './pages/PgCadastroCliente.dart';
 import 'package:json_theme/json_theme.dart';
+import 'package:firebase_core/firebase_core.dart';
+import './firebase_options.dart';
 
 import 'package:flutter/services.dart'; // For rootBundle
 import 'dart:convert'; // For jsonDecode
@@ -19,11 +21,14 @@ import 'dart:convert'; // For jsonDecode
 
 
 void main(List<String> args) async {
+  
+
   WidgetsFlutterBinding.ensureInitialized();
 
   final themeStr = await rootBundle.loadString('assets/appainter_theme.json');
   final themeJson = jsonDecode(themeStr);
   final theme = ThemeDecoder.decodeThemeData(themeJson)!;
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(MainApp(theme: theme));
 }

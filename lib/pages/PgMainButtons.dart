@@ -14,6 +14,7 @@ class PgMainButtons extends StatelessWidget {
     {'icon': Icons.content_paste, 'title': 'Visita Técnica', 'page': '/visita-tecnica'},
     {'icon': Icons.warehouse, 'title': 'Estoque', 'page': '/estoque'},
     {'icon': Icons.picture_as_pdf, 'title': 'Envio de Documentos', 'page': '/envio-documentos'},
+    {'icon': Icons.content_paste_go, 'title': 'Fazer Projeto', 'page': '/fazer-projeto'},
     {'icon': Icons.calculate, 'title': 'Tabelas de cálculo', 'page': '/tabelas'},
   ];
 

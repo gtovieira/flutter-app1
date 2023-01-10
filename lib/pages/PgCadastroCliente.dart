@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/ApiCalls.dart';
+import 'package:flutter_application_1/ClientData.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import '../regex.dart';
 import './PgClienteCadastrado.dart';
@@ -12,12 +13,40 @@ Future<void> _invalidCepDialog(BuildContext context) async {
     barrierDismissible: false, // user must tap button!
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('CEP Inválido'),
+        title: const Text('CEP Inexistente'),
         content: SingleChildScrollView(
           child: ListBody(
             children: const <Widget>[
               Text('O CEP Digitado não existe.'),
-              Text('Favor Digitar um CEP válido para carregar o endereço.'),
+              Text('Favor Digitar um CEP válido para carregar o endereço'),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Ok'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<void> _invalidCnpjDialog(BuildContext context) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('CNPJ Inexistente'),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: const <Widget>[
+              Text('O CNPJ Digitado não existe.'),
+              Text('Favor Digitar um CNPJ válido para carregar os dados'),
             ],
           ),
         ),
@@ -56,34 +85,41 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
 
   final _formCadClienteKey = GlobalKey<FormState>();
   bool _cepValidated = false;
+  final FocusNode _cepFocus = FocusNode();
+  bool _cnpjValidated = false;
+
+  ApiCalls api = ApiCalls(selectedBase: base.invertexto);
 
   void fetchCep() async {
-    Map response;
-    print(cepMask.getUnmaskedText());
-    ApiCalls.fetchCep(cep: int.parse(cepMask.getUnmaskedText())).then((value) {
-      response = jsonDecode(value.body);
-      print(response['street']);
+    try {
+      await api.fetchCep(cepToSearch: int.parse(cepMask.getUnmaskedText()));
       setState(() {
-        logController.text = response['street'];
-        bairroController.text = response['neighborhood'];
-        cityController.text = response['city'];
-        ufController.text = response['state'];
+        logController.text = api.logradouro;
+        bairroController.text = api.bairro;
+        cityController.text = api.cidade;
+        ufController.text = api.uf;
       });
-    });
+    } catch (error) {
+      // _cepFocus.requestFocus();
+      _invalidCepDialog(context);
+    }
   }
 
   void fetchCnpj() async {
-    dynamic response;
-    Map body;
-    response =
-        await ApiCalls.fetchCnpj(cnpj: int.parse(cnpjMask.getUnmaskedText()));
-    body = await jsonDecode(response.body);
-    setState(() {
-      razaoController.text = body['razao_social'];
-      fantasiaController.text = body['nome_fantasia'] ??= '';
-      // print(body['endereco']['cep'].runtimeType);
-      cepController.text = cepMask.maskText(body['endereco']['cep']);
-    });
+    try {
+      await api.fetchCnpj(cnpjToSearch: int.parse(cnpjMask.getUnmaskedText()));
+      setState(() {
+        razaoController.text = api.razaoSocial;
+        cepController.text = cepMask.maskText(api.cep);
+        logController.text = '${api.tipoLogradouro} ${api.logradouro}';
+        numeroController.text = api.numero;
+        bairroController.text = api.bairro;
+        cityController.text = api.cidade;
+        ufController.text = api.uf;
+      });
+    } catch (error) {
+      _invalidCnpjDialog(context);
+    }
   }
 
   void _clearAddressFields() {
@@ -93,23 +129,28 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
     ufController.clear();
   }
 
-  var cpfMask = MaskTextInputFormatter(
+  final cpfMask = MaskTextInputFormatter(
       mask: '###.###.###-##',
       filter: {'#': RegExp(r'[0-9]')},
       type: MaskAutoCompletionType.lazy);
 
-  var cnpjMask = MaskTextInputFormatter(
+  final cnpjMask = MaskTextInputFormatter(
       mask: '##.###.###/####-##',
       filter: {'#': RegExp(r'[0-9]')},
       type: MaskAutoCompletionType.lazy);
 
-  var dobMask = MaskTextInputFormatter(
+  final dobMask = MaskTextInputFormatter(
       mask: '##/##/####',
       filter: {'#': RegExp(r'[0-9]')},
       type: MaskAutoCompletionType.lazy);
 
-  var cepMask = MaskTextInputFormatter(
+  final cepMask = MaskTextInputFormatter(
       mask: '##.###-###',
+      filter: {'#': RegExp(r'[0-9]')},
+      type: MaskAutoCompletionType.lazy);
+
+  final phoneMask = MaskTextInputFormatter(
+      mask: '(##) #####-####',
       filter: {'#': RegExp(r'[0-9]')},
       type: MaskAutoCompletionType.lazy);
 
@@ -117,7 +158,9 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
     Text('Pessoa Física'),
     Text('Pessoa Jurídica')
   ];
-  final List<bool> _pfPjSelected = [false, false];
+  final List<bool> _pfPjSelected = [true, false];
+
+  ClientData clientData = ClientData();
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +179,7 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                 onPressed: () {
                   if (_formCadClienteKey.currentState!.validate()) {
                     _formCadClienteKey.currentState!.save();
+                    clientData.sendData();
                     Navigator.push(context, MaterialPageRoute(builder: (_) {
                       return PgClienteCadastrado();
                     }));
@@ -178,21 +222,39 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                   TextFormField(
                     decoration:
                         const InputDecoration(labelText: 'Código do Projeto'),
+                    onSaved: (newValue) => clientData.codProjeto = newValue,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Campo Obrigatório';
+                      } else {
+                        return null;
+                      }
+                    },
                   ),
                   _pfPjSelected[1]
-                      ? TextFormField(
-                          decoration: InputDecoration(labelText: 'CNPJ'),
-                          inputFormatters: [cnpjMask],
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Campo Obrigatório';
-                            } else if (!RegexCodes.cnpj.hasMatch(value)) {
-                              return 'CNPJ inválido';
-                            } else {
+                      ? Focus(
+                          onFocusChange: ((value) {
+                            if (!value && _cnpjValidated) {
                               fetchCnpj();
-                              return null;
                             }
-                          },
+                          }),
+                          child: TextFormField(
+                            decoration: InputDecoration(labelText: 'CNPJ'),
+                            onSaved: (newValue) => clientData.cnpj = newValue,
+                            inputFormatters: [cnpjMask],
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                _cnpjValidated = false;
+                                return 'Campo Obrigatório';
+                              } else if (!RegexCodes.cnpj.hasMatch(value)) {
+                                _cnpjValidated = false;
+                                return 'CNPJ inválido';
+                              } else {
+                                _cnpjValidated = true;
+                                return null;
+                              }
+                            },
+                          ),
                         )
                       : SizedBox.shrink(),
                   _pfPjSelected[1]
@@ -200,15 +262,34 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                           decoration:
                               InputDecoration(labelText: 'Razão Social'),
                           controller: razaoController,
+                          onSaved: (newValue) =>
+                              clientData.razaoSocial = newValue,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Campo Obrigatório';
+                            } else {
+                              return null;
+                            }
+                          },
                         )
                       : SizedBox.shrink(),
                   TextFormField(
+                    onSaved: (newValue) => clientData.nome = newValue,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Campo Obrigatório';
+                      } else {
+                        return null;
+                      }
+                    },
                     decoration: _pfPjSelected[1]
-                        ? InputDecoration(labelText: 'Nome do Responsável')
-                        : InputDecoration(labelText: 'Nome Completo'),
+                        ? const InputDecoration(
+                            labelText: 'Nome do Responsável')
+                        : const InputDecoration(labelText: 'Nome Completo'),
                   ),
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'CPF'),
+                    decoration: const InputDecoration(labelText: 'CPF'),
+                    onSaved: (newValue) => clientData.cpf = newValue,
                     inputFormatters: [cpfMask],
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -224,9 +305,20 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                     decoration:
                         InputDecoration(labelText: 'Data de Nascimento'),
                     inputFormatters: [dobMask],
+                    onSaved: (newValue) => clientData.dob = newValue,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Campo Obrigatório';
+                      } else if (RegexCodes.dob.hasMatch(value)) {
+                        return null;
+                      } else {
+                        return 'Digite uma data válida';
+                      }
+                    },
                   ),
                   TextFormField(
                     decoration: InputDecoration(labelText: 'E-mail'),
+                    onSaved: (newValue) => clientData.email = newValue,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Campo obrigatório';
@@ -238,7 +330,10 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                     },
                   ),
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'Telefone Celular'),
+                    decoration:
+                        const InputDecoration(labelText: 'Telefone Celular'),
+                    onSaved: (newValue) => clientData.phone = newValue,
+                    inputFormatters: [phoneMask],
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Campo Obrigatório';
@@ -251,8 +346,10 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                   ),
                   Focus(
                     child: TextFormField(
-                      decoration: InputDecoration(labelText: 'CEP'),
+                      decoration: const InputDecoration(labelText: 'CEP'),
+                      onSaved: (newValue) => clientData.cep = newValue,
                       inputFormatters: [cepMask],
+                      focusNode: _cepFocus,
                       controller: cepController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -277,10 +374,20 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                   ),
                   TextFormField(
                     decoration: InputDecoration(labelText: 'Logradouro'),
+                    onSaved: (newValue) => clientData.logradouro = newValue,
                     controller: logController,
+                    validator: ((value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Campo Obrigatório';
+                      } else {
+                        return null;
+                      }
+                    }),
                   ),
                   TextFormField(
                     decoration: InputDecoration(labelText: 'Número'),
+                    onSaved: (newValue) => clientData.numero = newValue,
+                    controller: numeroController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Campo Obrigatório';
@@ -291,15 +398,39 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                   ),
                   TextFormField(
                     decoration: InputDecoration(labelText: 'Bairro'),
+                    onSaved: (newValue) => clientData.bairro = newValue,
                     controller: bairroController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Campo Obrigatório';
+                      } else {
+                        return null;
+                      }
+                    },
                   ),
                   TextFormField(
                     decoration: InputDecoration(labelText: 'Cidade'),
+                    onSaved: (newValue) => clientData.cidade = newValue,
                     controller: cityController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Campo Obrigatório';
+                      } else {
+                        return null;
+                      }
+                    },
                   ),
                   TextFormField(
                     decoration: InputDecoration(labelText: 'UF'),
+                    onSaved: (newValue) => clientData.uf = newValue,
                     controller: ufController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Campo Obrigatório';
+                      } else {
+                        return null;
+                      }
+                    },
                   ),
                 ],
               ),
