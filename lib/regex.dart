@@ -25,4 +25,6 @@ class RegexCodes {
   static final number = RegExp(r'.*');
   static final city = RegExp(r'.*');
   static final uf = RegExp(r'.*');
+
+  static final mapsLink = RegExp(r'^https://goo.gl/maps/*');
 }

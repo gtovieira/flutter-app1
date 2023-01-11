@@ -11,13 +11,15 @@ class Conta extends Object {
 class ProjectData extends Object {
   late ClientData client;
   String? codProjeto,
-      nome, razaoSocial,
+      nome,
+      razaoSocial,
       cpf,
       cnpj,
       logradouro,
       cidade,
       uf,
       bairro,
+      numero,
       cep,
       contaContrato,
       mapsLink,
@@ -32,7 +34,8 @@ class ProjectData extends Object {
       nfCpf,
       nfCnpj,
       nfEndereco,
-      nfCep, nfObs;
+      nfCep,
+      nfObs;
   late DateTime dataFechamento;
   late double lat, long, preco;
   bool? contaContratoExistente, enviaCreditos, trocaTitularidade;
