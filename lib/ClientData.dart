@@ -17,6 +17,7 @@ class ClientData extends Object {
       bairro,
       cidade,
       uf;
+      late bool isPf; // Implement this flag everywhere
 
   // ClientData(
   //     {required this.codProjeto,
@@ -36,6 +37,7 @@ class ClientData extends Object {
   ClientData();
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  List<String> clientNames = [];
 
   Future sendData() async {
     CollectionReference clients = firestore.collection('clients');
@@ -55,5 +57,24 @@ class ClientData extends Object {
       'cidade': cidade,
       'uf': uf
     });
+    
   }
+  Future getData() async {
+    CollectionReference clients = firestore.collection('oldClients');
+    
+    QuerySnapshot snapshot = await clients.get();
+    Map<String, dynamic> data;
+    
+    snapshot.docs.forEach((element) {
+      data = element.data() as Map<String, dynamic>;
+      // print(data);
+      if (data['nome'] != null)  clientNames.add(data['nome']) ;
+    },);
+    // print(clientNames);
+    return clientNames;
+  }
+
+  // List<String> getNames() {
+  //   getData()
+  // }
 }
