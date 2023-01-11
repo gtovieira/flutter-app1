@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/ApiCalls.dart';
 import 'package:flutter_application_1/ClientData.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import '../regex.dart';
 import './PgClienteCadastrado.dart';
+import '../Masks.dart';
 
 Future<void> _invalidCepDialog(BuildContext context) async {
   return showDialog<void>(
@@ -92,7 +92,7 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
 
   void fetchCep() async {
     try {
-      await api.fetchCep(cepToSearch: int.parse(cepMask.getUnmaskedText()));
+      await api.fetchCep(cepToSearch: int.parse(Masks.cepMask.getUnmaskedText()));
       setState(() {
         logController.text = api.logradouro;
         bairroController.text = api.bairro;
@@ -107,10 +107,10 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
 
   void fetchCnpj() async {
     try {
-      await api.fetchCnpj(cnpjToSearch: int.parse(cnpjMask.getUnmaskedText()));
+      await api.fetchCnpj(cnpjToSearch: int.parse(Masks.cnpjMask.getUnmaskedText()));
       setState(() {
         razaoController.text = api.razaoSocial;
-        cepController.text = cepMask.maskText(api.cep);
+        cepController.text = Masks.cepMask.maskText(api.cep);
         logController.text = '${api.tipoLogradouro} ${api.logradouro}';
         numeroController.text = api.numero;
         bairroController.text = api.bairro;
@@ -129,30 +129,7 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
     ufController.clear();
   }
 
-  final cpfMask = MaskTextInputFormatter(
-      mask: '###.###.###-##',
-      filter: {'#': RegExp(r'[0-9]')},
-      type: MaskAutoCompletionType.lazy);
 
-  final cnpjMask = MaskTextInputFormatter(
-      mask: '##.###.###/####-##',
-      filter: {'#': RegExp(r'[0-9]')},
-      type: MaskAutoCompletionType.lazy);
-
-  final dobMask = MaskTextInputFormatter(
-      mask: '##/##/####',
-      filter: {'#': RegExp(r'[0-9]')},
-      type: MaskAutoCompletionType.lazy);
-
-  final cepMask = MaskTextInputFormatter(
-      mask: '##.###-###',
-      filter: {'#': RegExp(r'[0-9]')},
-      type: MaskAutoCompletionType.lazy);
-
-  final phoneMask = MaskTextInputFormatter(
-      mask: '(##) #####-####',
-      filter: {'#': RegExp(r'[0-9]')},
-      type: MaskAutoCompletionType.lazy);
 
   static const List<Widget> pfPjList = [
     Text('Pessoa Física'),
@@ -241,7 +218,7 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                           child: TextFormField(
                             decoration: InputDecoration(labelText: 'CNPJ'),
                             onSaved: (newValue) => clientData.cnpj = newValue,
-                            inputFormatters: [cnpjMask],
+                            inputFormatters: [Masks.cnpjMask],
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 _cnpjValidated = false;
@@ -290,7 +267,7 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                   TextFormField(
                     decoration: const InputDecoration(labelText: 'CPF'),
                     onSaved: (newValue) => clientData.cpf = newValue,
-                    inputFormatters: [cpfMask],
+                    inputFormatters: [Masks.cpfMask],
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'Campo obrigatório';
@@ -304,7 +281,7 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                   TextFormField(
                     decoration:
                         InputDecoration(labelText: 'Data de Nascimento'),
-                    inputFormatters: [dobMask],
+                    inputFormatters: [Masks.dobMask],
                     onSaved: (newValue) => clientData.dob = newValue,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -333,7 +310,7 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                     decoration:
                         const InputDecoration(labelText: 'Telefone Celular'),
                     onSaved: (newValue) => clientData.phone = newValue,
-                    inputFormatters: [phoneMask],
+                    inputFormatters: [Masks.phoneMask],
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Campo Obrigatório';
@@ -348,7 +325,7 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                     child: TextFormField(
                       decoration: const InputDecoration(labelText: 'CEP'),
                       onSaved: (newValue) => clientData.cep = newValue,
-                      inputFormatters: [cepMask],
+                      inputFormatters: [Masks.cepMask],
                       focusNode: _cepFocus,
                       controller: cepController,
                       validator: (value) {
