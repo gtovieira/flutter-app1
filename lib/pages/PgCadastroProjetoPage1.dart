@@ -4,6 +4,7 @@ import 'package:flutter_application_1/ProjectData.dart';
 import '../ApiCalls.dart';
 import '../Masks.dart';
 import '../regex.dart';
+import 'PgCadastroProjeto.dart';
 
 Future<void> _invalidCepDialog(BuildContext context) async {
   return showDialog<void>(
@@ -118,7 +119,6 @@ const List<String> vendors = [
 ];
 
 ClientData clients = ClientData();
-ProjectData project = ProjectData();
 late List<String> clientList;
 
 Future<List<String>> retrieveClients() async {
@@ -210,6 +210,12 @@ class _PgCadastroProjetoPage1State extends State<PgCadastroProjetoPage1> {
     Text('Novo Titular')
   ];
 
+  final List<bool> _contaContrato = [true, false];
+  static const List<Widget> _contaContratoList = [
+    Text('Conta Contrato Existente'),
+    Text('Conta Contrato Nova')
+  ];
+
   static const List<Widget> pfPjList = [
     Text('Pessoa Física'),
     Text('Pessoa Jurídica')
@@ -256,6 +262,38 @@ class _PgCadastroProjetoPage1State extends State<PgCadastroProjetoPage1> {
                             selectedVendor = value!;
                           });
                         }),
+                    Center(
+                      child: ToggleButtons(
+                        isSelected: _contaContrato,
+                        onPressed: (index) {
+                          setState(() {
+                            for (int i = 0; i < _contaContrato.length; i++) {
+                              _contaContrato[i] = i == index;
+                            }
+                          });
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        fillColor: Color.fromARGB(255, 91, 161, 87),
+                        color: Color.fromARGB(255, 91, 161, 87),
+                        selectedColor: Colors.white,
+                        textStyle: TextStyle(fontSize: 13),
+                        constraints:
+                            BoxConstraints(minHeight: 50, minWidth: 180),
+                        children: _contaContratoList,
+                      ),
+                    ),
+                    _contaContrato[0] ? TextFormField(
+                      decoration: const InputDecoration(
+                          labelText: 'Conta Contrato*'),
+                      onSaved: (newValue) => project.contaContrato = newValue,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Campo Obrigatório';
+                        } else {
+                          return null;
+                        }
+                      },
+                    ) : SizedBox.shrink(),
                     Center(
                       child: ToggleButtons(
                         isSelected: _aproveitaDadosCliente,

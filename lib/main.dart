@@ -12,6 +12,9 @@ import './pages/PgCadastroCliente.dart';
 import 'package:json_theme/json_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import './firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 import 'package:flutter/services.dart'; // For rootBundle
 import 'dart:convert'; // For jsonDecode
@@ -20,6 +23,7 @@ import 'dart:convert'; // For jsonDecode
 //Implement buttons in the main page
 
 
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 void main(List<String> args) async {
   
 

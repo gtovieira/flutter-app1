@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_application_1/ProjectData.dart';
 import 'package:flutter_application_1/pages/PgCadastroProjetoPage1.dart';
 import 'package:flutter_application_1/pages/PgCadastroProjetoPage2.dart';
 import 'package:flutter_application_1/pages/PgCadastroProjetoPage3.dart';
 import 'package:flutter_application_1/pages/PgCadastroProjetoPage4.dart';
 import 'package:flutter_application_1/pages/PgCadastroProjetoPage5.dart';
+
+ProjectData project = ProjectData();
 
 class PgCadastroProjeto extends StatefulWidget {
   const PgCadastroProjeto({super.key});

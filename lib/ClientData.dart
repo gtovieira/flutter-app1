@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
+import '../main.dart';
 
 class ClientData extends Object {
   late String? codProjeto,
@@ -36,7 +37,6 @@ class ClientData extends Object {
   //     required this.phone});
   ClientData();
 
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
   List<String> clientNames = [];
 
   Future sendData() async {

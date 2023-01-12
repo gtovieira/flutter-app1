@@ -19,7 +19,7 @@ class _PgCadastroProjetoPage3State extends State<PgCadastroProjetoPage3> {
                 key: _formCadProjPg3Key,
                 // autovalidateMode: AutovalidateMode.always,
                 child: ListView(children: [
-                  Text(
+                  const Text(
                     'Selecione o Cliente:',
                     textScaleFactor: 1.1,
                   ),
