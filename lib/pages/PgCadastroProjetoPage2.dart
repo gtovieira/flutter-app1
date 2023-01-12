@@ -18,7 +18,8 @@ Future retrieveModules() async {
 }
 
 class PgCadastroProjetoPage2 extends StatefulWidget {
-  const PgCadastroProjetoPage2({super.key});
+  int? numInverters, numModules;
+  PgCadastroProjetoPage2({super.key, this.numInverters, this.numModules});
 
   @override
   State<PgCadastroProjetoPage2> createState() => _PgCadastroProjetoPage2State();
@@ -29,6 +30,7 @@ class _PgCadastroProjetoPage2State extends State<PgCadastroProjetoPage2> {
   void initState() {
     retrieveInverters();
     retrieveModules();
+    print(widget.numInverters);
     super.initState();
   }
 
@@ -72,6 +74,8 @@ class _PgCadastroProjetoPage2State extends State<PgCadastroProjetoPage2> {
                                   child: InverterView(
                                       mainText:
                                           options.elementAt(index).toString(),
+                                      secondaryText:
+                                          options.elementAt(index).fabricante,
                                       powerText:
                                           options.elementAt(index).potencia,
                                       voltageText:
@@ -123,7 +127,7 @@ class _PgCadastroProjetoPage2State extends State<PgCadastroProjetoPage2> {
                                 return InkWell(
                                   child: ModuleView(
                                     mainText:
-                                        options.elementAt(index).toString(),
+                                        options.elementAt(index).toString(),secondaryText: options.elementAt(index).fabricante,
                                     powerText:
                                         options.elementAt(index).potencia,
                                   ),

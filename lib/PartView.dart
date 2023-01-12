@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class InverterView extends StatelessWidget {
-  String mainText;
+  String mainText, secondaryText;
   double powerText;
   int voltageText;
   InverterView(
       {super.key,
-      required this.mainText,
+      required this.mainText, required this.secondaryText,
       required this.voltageText,
       required this.powerText});
 
@@ -24,10 +24,13 @@ class InverterView extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 1,
-                  child: Text(
+                  child: Column(children: [Text(
                     mainText,
                     style: TextStyle(fontSize: 18),
-                  ),
+                  ),Text(
+                    secondaryText,
+                    style: TextStyle(fontSize: 11),
+                  ),],)
                 ),
                 Container(
                   decoration: BoxDecoration(
@@ -85,11 +88,11 @@ class InverterView extends StatelessWidget {
 }
 
 class ModuleView extends StatelessWidget {
-  String mainText;
+  String mainText, secondaryText;
   int powerText;
   ModuleView(
       {super.key,
-      required this.mainText,
+      required this.mainText, required this.secondaryText,
       required this.powerText});
 
   @override
@@ -106,10 +109,13 @@ class ModuleView extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 1,
-                  child: Text(
+                  child: Column(children: [Text(
                     mainText,
                     style: TextStyle(fontSize: 18),
-                  ),
+                  ),Text(
+                    secondaryText,
+                    style: TextStyle(fontSize: 11),
+                  ),],)
                 ),
                 
                 Container(
