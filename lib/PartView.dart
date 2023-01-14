@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class InverterView extends StatelessWidget {
   String mainText, secondaryText;
-  double powerText;
-  int voltageText;
+  num powerText;
+  num voltageText;
   InverterView(
       {super.key,
       required this.mainText, required this.secondaryText,
@@ -89,7 +89,7 @@ class InverterView extends StatelessWidget {
 
 class ModuleView extends StatelessWidget {
   String mainText, secondaryText;
-  int powerText;
+  num powerText;
   ModuleView(
       {super.key,
       required this.mainText, required this.secondaryText,
