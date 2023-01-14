@@ -9,8 +9,7 @@ enum tipoEstrutura { metalico, fibrocimento, solo, ceramico, laje, carport }
 
 class Inverter {
   late String modelo, fabricante;
-  late double potencia;
-  late int fases, tensao;
+  late num potencia, fases, tensao;
 
   Inverter(
       {required this.modelo,
@@ -51,9 +50,22 @@ class Module {
   }
 }
 
+class Estrutura {
+  late String tipoEstrutura;
+
+  Estrutura({required this.tipoEstrutura});
+
+  @override
+  String toString() {
+    return tipoEstrutura;
+  }
+}
+
+
+
 class Conta extends Object {
   String? contaContrato, titular, cpf, cnpj;
-  double? porcentagem;
+  num? porcentagem;
 }
 
 class ProjectData extends Object {
@@ -92,7 +104,7 @@ class ProjectData extends Object {
   ProjectData();
 
   List<String> invertersListAsString = [];
-  List<Inverter> invertersList = [];
+  
 
   Future getInvertersAsString() async {
     CollectionReference inverters = firestore.collection('inverters');
@@ -107,6 +119,8 @@ class ProjectData extends Object {
   }
 
   Future getInverters() async {
+    List<Inverter> invertersList = [];
+
     CollectionReference inverters = firestore.collection('inverters');
     QuerySnapshot snapshot = await inverters.get();
     Map<String, dynamic> data;
@@ -117,7 +131,7 @@ class ProjectData extends Object {
           fabricante: data['fabricante'] ??= '',
           modelo: data['modelo'] ??= '',
           fases: data['fases'] ??= 0,
-          potencia: data['potencia'] ??= 0.0,
+          potencia: data['potencia'] ??= 0,
           tensao: data['tensao'] ??= 0);
       invertersList.add(inv);
     });
@@ -138,6 +152,21 @@ class ProjectData extends Object {
       moduleList.add(mod);
     });
     return moduleList;
+  }
+
+  Future getStructure() async {
+    List<Estrutura> estruturaList = [];
+
+    CollectionReference structure = firestore.collection('structure');
+    QuerySnapshot snapshot = await structure.get();
+    Map<String, dynamic> data;
+
+    snapshot.docs.forEach((element) {
+      data = element.data() as Map<String, dynamic>;
+      Estrutura str = Estrutura(tipoEstrutura: data['tipo']);
+      estruturaList.add(str);
+    });
+    return estruturaList;
   }
 
   Future getData() async {

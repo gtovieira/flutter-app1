@@ -192,7 +192,7 @@ class _PgCadastroClienteState extends State<PgCadastroCliente> {
                       color: Color.fromARGB(255, 91, 161, 87),
                       selectedColor: Colors.white,
                       textStyle: TextStyle(fontSize: 20),
-                      constraints: BoxConstraints(minHeight: 50, minWidth: 180),
+                      constraints: BoxConstraints(minHeight: 50, minWidth: 165),
                       children: pfPjList,
                     ),
                   ),

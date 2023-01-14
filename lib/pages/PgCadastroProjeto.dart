@@ -18,12 +18,10 @@ class PgCadastroProjeto extends StatefulWidget {
 
 class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
   int _selectedPage = 0;
-  late int _numInverters;
-  late int _numModules;
+  late int _numInverters = 1;
+  late int _numModules = 1;
   @override
   void initState() {
-    _numInverters = 1;
-    _numModules = 1;
     super.initState();
   }
 
@@ -71,25 +69,29 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
                 overlayStyle: ExpandableFabOverlayStyle(blur: 5),
                 children: [
                     FloatingActionButton.extended(
+                      heroTag: 'hero1',
                       label: Text('Adicionar Inversor'),
                       icon: Icon(Icons.bolt),
                       onPressed: () {
                         setState(() {
+                          _numInverters++;
                           _pagesList[1] = PgCadastroProjetoPage2(
-                            numInverters: _numInverters++,
+                            numInverters: _numInverters,
                             numModules: _numModules,
                           );
                         });
                       },
                     ),
                     FloatingActionButton.extended(
+                      heroTag: 'hero2',
                       label: Text('Adicionar Módulo'),
                       icon: Icon(Icons.sunny),
                       onPressed: () {
                         setState(() {
+                          _numModules++;
                           _pagesList[1] = PgCadastroProjetoPage2(
                             numInverters: _numInverters,
-                            numModules: _numModules++,
+                            numModules: _numModules,
                           );
                         });
                       },

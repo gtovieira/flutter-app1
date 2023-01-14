@@ -37,7 +37,7 @@ class PageButton extends StatelessWidget {
                   actionName,
                   textAlign: TextAlign.center,
                   style:
-                      const TextStyle(fontFamily: 'Montserrat', fontSize: 16),
+                      const TextStyle(fontFamily: 'Montserrat', fontSize: 14),
                 ),
               )
             ],

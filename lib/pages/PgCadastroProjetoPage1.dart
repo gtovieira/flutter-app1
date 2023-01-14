@@ -278,7 +278,7 @@ class _PgCadastroProjetoPage1State extends State<PgCadastroProjetoPage1> {
                         selectedColor: Colors.white,
                         textStyle: TextStyle(fontSize: 13),
                         constraints:
-                            BoxConstraints(minHeight: 50, minWidth: 180),
+                            BoxConstraints(minHeight: 50, minWidth: 165),
                         children: _contaContratoList,
                       ),
                     ),
@@ -312,7 +312,7 @@ class _PgCadastroProjetoPage1State extends State<PgCadastroProjetoPage1> {
                         selectedColor: Colors.white,
                         textStyle: TextStyle(fontSize: 20),
                         constraints:
-                            BoxConstraints(minHeight: 50, minWidth: 180),
+                            BoxConstraints(minHeight: 50, minWidth: 165),
                         children: __aproveitaDadosClienteList,
                       ),
                     ),
