@@ -18,8 +18,9 @@ class PgCadastroProjeto extends StatefulWidget {
 
 class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
   int _selectedPage = 0;
-  late int _numInverters = 1;
-  late int _numModules = 1;
+  int _numInverters = 1;
+  int _numModules = 1;
+  int _numContas = 1;
   @override
   void initState() {
     super.initState();
@@ -31,7 +32,7 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
       numInverters: 1,
       numModules: 1,
     ),
-    PgCadastroProjetoPage3(),
+    PgCadastroProjetoPage3(numContas: 1,),
     PgCadastroProjetoPage4(),
     PgCadastroProjetoPage5()
   ];
@@ -63,7 +64,7 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
           ),
         ),
         body: _pagesList[_selectedPage],
-        floatingActionButtonLocation: ExpandableFab.location,
+        floatingActionButtonLocation: _selectedPage == 1 ? ExpandableFab.location : null,
         floatingActionButton: _selectedPage == 1
             ? ExpandableFab(
                 overlayStyle: ExpandableFabOverlayStyle(blur: 5),
@@ -97,7 +98,20 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
                       },
                     )
                   ])
-            : SizedBox.shrink(),
+            : _selectedPage == 2
+                ? FloatingActionButton(
+                          heroTag: 'hero3',
+                          child: Icon(Icons.add),
+                          onPressed: () {
+                            setState(() {
+                              _numContas++;
+                              _pagesList[2] = PgCadastroProjetoPage3(
+                                numContas: _numContas,
+                              );
+                            });
+                          },
+                        )
+                : SizedBox.shrink(),
         bottomNavigationBar: BottomNavigationBar(
           items: const [
             BottomNavigationBarItem(
@@ -105,7 +119,7 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
             BottomNavigationBarItem(icon: Icon(Icons.roofing), label: 'Kit'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.receipt_long), label: 'Contas'),
-            BottomNavigationBarItem(icon: Icon(Icons.paid), label: 'Pagamento'),
+            BottomNavigationBarItem(icon: Icon(Icons.paid), label: 'Pag'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.description), label: 'Docs')
           ],
@@ -119,7 +133,7 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
           showUnselectedLabels: true,
           selectedFontSize: 13,
           iconSize: 25,
-          unselectedFontSize: 12,
+          unselectedFontSize: 11,
           selectedLabelStyle: TextStyle(
             overflow: TextOverflow.visible,
           ),

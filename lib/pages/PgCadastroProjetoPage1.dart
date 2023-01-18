@@ -353,7 +353,7 @@ class _PgCadastroProjetoPage1State extends State<PgCadastroProjetoPage1> {
                                 selectedColor: Colors.white,
                                 textStyle: TextStyle(fontSize: 20),
                                 constraints: const BoxConstraints(
-                                    minHeight: 50, minWidth: 180),
+                                    minHeight: 50, minWidth: 165),
                                 children: pfPjList,
                               ),
                             ),

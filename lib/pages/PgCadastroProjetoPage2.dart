@@ -6,9 +6,9 @@ import '../PartView.dart';
 final _formCadProjPg2Key = GlobalKey<FormState>();
 List<Inverter> inverterList = [];
 List<Widget> inverterWidgetList = [];
-List<Inverter> selectedInverters = [];
+List<Inverter?> selectedInverters = [];
 List<Module> moduleList = [];
-List<Module> selectedModules = [];
+List<Module?> selectedModules = [];
 List<Widget> moduleWidgetList = [];
 List<Estrutura> estruturaList = [];
 late Estrutura selectedStructure;
@@ -41,10 +41,13 @@ class InverterAutocomplete extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Wrap(children: <Widget>[
-      Transform.translate(offset: Offset(0,8), child: Text(
-        'Selecione o inversor ${inverterNumber + 1}',
-        textScaleFactor: 1.1,
-      ),),
+      Transform.translate(
+        offset: Offset(0, 8),
+        child: Text(
+          'Selecione o inversor ${inverterNumber + 1}',
+          textScaleFactor: 1.1,
+        ),
+      ),
       Autocomplete<Inverter>(
         displayStringForOption: (Inverter option) {
           return option.toString();
@@ -100,10 +103,13 @@ class ModuleAutocomplete extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Wrap(children: <Widget>[
-      Transform.translate(offset: Offset(0, 8), child: Text(
-        'Selecione o módulo ${moduleNumber + 1}',
-        textScaleFactor: 1.1,
-      ),),
+      Transform.translate(
+        offset: Offset(0, 8),
+        child: Text(
+          'Selecione o módulo ${moduleNumber + 1}',
+          textScaleFactor: 1.1,
+        ),
+      ),
       Autocomplete<Module>(
         displayStringForOption: (Module option) {
           return option.toString();
@@ -145,7 +151,7 @@ class ModuleAutocomplete extends StatelessWidget {
           selectedModules[moduleNumber] = option;
         },
       ),
-      SizedBox(
+      const SizedBox(
         height: 60,
       )
     ]);
@@ -153,8 +159,9 @@ class ModuleAutocomplete extends StatelessWidget {
 }
 
 class PgCadastroProjetoPage2 extends StatefulWidget {
-  int? numInverters, numModules;
-  PgCadastroProjetoPage2({super.key, this.numInverters, this.numModules});
+  int numInverters, numModules;
+  PgCadastroProjetoPage2(
+      {super.key, required this.numInverters, required this.numModules});
 
   @override
   State<PgCadastroProjetoPage2> createState() => _PgCadastroProjetoPage2State();
@@ -166,16 +173,43 @@ class _PgCadastroProjetoPage2State extends State<PgCadastroProjetoPage2> {
     retrieveInverters();
     retrieveModules();
     retrieveEstrutura();
+    selectedInverters = List.filled(10, null);
+    selectedModules = List.filled(10, null);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    inverterWidgetList = List.generate(widget.numInverters ??= 1,
-        (index) => InverterAutocomplete(inverterNumber: index));
+    inverterWidgetList = List.generate(widget.numInverters ??= 1, (index) {
+      return Row(
+        children: [
+          Expanded(
+              flex: 4,
+              child: InverterAutocomplete(
+                inverterNumber: index,
+              )),
+          SizedBox(
+            width: 20,
+          ),
+          Expanded(
+              flex: 1,
+              child: TextFormField(
+                decoration: InputDecoration(labelText: 'Qtd'),
+              ))
+        ],
+      );
+    });
     moduleWidgetList = List.generate(
       widget.numModules ??= 1,
-      (index) => ModuleAutocomplete(moduleNumber: index),
+      (index) {
+        return Row(
+          children: [
+            Expanded(flex: 4, child: ModuleAutocomplete(moduleNumber: index)),
+            SizedBox(width: 20),
+            Expanded(flex: 1, child: TextFormField(decoration: InputDecoration(labelText: 'Qtd'))),
+          ],
+        );
+      },
     );
     return Center(
         child: Container(
@@ -186,7 +220,10 @@ class _PgCadastroProjetoPage2State extends State<PgCadastroProjetoPage2> {
               child: ListView(
                   children: inverterWidgetList +
                       moduleWidgetList +
-                      [SizedBox(height: 20,),
+                      [
+                        SizedBox(
+                          height: 20,
+                        ),
                         FutureBuilder(
                           future: retrieveEstrutura(),
                           builder: (context, snapshot) {
@@ -195,7 +232,6 @@ class _PgCadastroProjetoPage2State extends State<PgCadastroProjetoPage2> {
                                   decoration: const InputDecoration(
                                       labelText: 'Tipo de Estrutura'),
                                   items: estruturaList.map((e) {
-                                    print(e);
                                     return DropdownMenuItem(
                                         value: e, child: Text(e.tipoEstrutura));
                                   }).toList(),
