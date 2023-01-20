@@ -19,8 +19,9 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/services.dart'; // For rootBundle
 import 'dart:convert'; // For jsonDecode
 
-//TOdo
-//Implement buttons in the main page
+// TOdo
+// Procuração com QR Code pra enviar projeto direto pra a pasta do cliente
+// 
 
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
