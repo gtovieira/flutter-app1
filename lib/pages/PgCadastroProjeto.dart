@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/ProjectData.dart';
+import 'package:flutter_application_1/pages/PgCadastroProjetoEnd.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
-import 'package:flutter_application_1/pages/PgCadastroProjetoPage1.dart';
-import 'package:flutter_application_1/pages/PgCadastroProjetoPage2.dart';
-import 'package:flutter_application_1/pages/PgCadastroProjetoPage3.dart';
-import 'package:flutter_application_1/pages/PgCadastroProjetoPage4.dart';
-import 'package:flutter_application_1/pages/PgCadastroProjetoPage5.dart';
+import 'package:flutter_application_1/pages/PgCadastroProjetoDados.dart';
+import 'package:flutter_application_1/pages/PgCadastroProjetoKit.dart';
+import 'package:flutter_application_1/pages/PgCadastroProjetoContas.dart';
+import 'package:flutter_application_1/pages/PgCadastroProjetoPag.dart';
+import 'package:flutter_application_1/pages/PgCadastroProjetoDocs.dart';
+// import './PgCadastroProjetoPage1.dart';
 
 ProjectData project = ProjectData();
+
+enum ProjectPages { dados, end, kit, contas, pag, docs }
+
+List<GlobalKey<FormState>> formKeys = [];
+List<bool> formValidated = [false, false, false, false, false, false];
 
 class PgCadastroProjeto extends StatefulWidget {
   const PgCadastroProjeto({super.key});
@@ -23,18 +30,22 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
   int _numContas = 1;
   @override
   void initState() {
+    formKeys = List.generate(6, (index) => GlobalKey<FormState>());
     super.initState();
   }
 
   static final List<Widget> _pagesList = <Widget>[
-    PgCadastroProjetoPage1(),
-    PgCadastroProjetoPage2(
+    const PgCadastroProjetoDados(),
+    const PgCadastroProjetoEnd(),
+    PgCadastroProjetoKit(
       numInverters: 1,
       numModules: 1,
     ),
-    PgCadastroProjetoPage3(numContas: 1,),
-    PgCadastroProjetoPage4(),
-    PgCadastroProjetoPage5()
+    PgCadastroProjetoContas(
+      numContas: 1,
+    ),
+    const PgCadastroProjetoPag(),
+    const PgCadastroProjetoDocs(),
   ];
 
   @override
@@ -51,21 +62,31 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
                   },
                   icon: const Icon(Icons.backspace)),
               IconButton(
-                  onPressed: () {
-                    //   if (_formCadProjKey.currentState!.validate()) {
-                    //     _formCadProjKey.currentState!.save();
-                    //     // project.sendData();
-                    //     Navigator.pushNamed(context, '/');
-                    //   }
-                    //   ;
-                  },
-                  icon: const Icon(Icons.save))
+                onPressed: () {
+                  if (formKeys[_selectedPage].currentState!.validate()) {
+                    formKeys[_selectedPage].currentState!.save();
+                    setState(() {
+                      formValidated[_selectedPage] = true;
+                    });
+                    // project.sendData();
+                    // Navigator.pushNamed(context, '/');
+                  }
+                },
+                icon: formValidated[_selectedPage]
+                    ? const Icon(Icons.check_circle)
+                    : const Icon(Icons.save),
+                color: formValidated[_selectedPage]
+                    ? Colors.green[900]
+                    : Colors.red[900],
+              )
             ],
           ),
         ),
         body: _pagesList[_selectedPage],
-        floatingActionButtonLocation: _selectedPage == 1 ? ExpandableFab.location : null,
-        floatingActionButton: _selectedPage == 1
+        floatingActionButtonLocation: _selectedPage == ProjectPages.kit.index
+            ? ExpandableFab.location
+            : null,
+        floatingActionButton: _selectedPage == ProjectPages.kit.index
             ? ExpandableFab(
                 overlayStyle: ExpandableFabOverlayStyle(blur: 5),
                 children: [
@@ -76,7 +97,7 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
                       onPressed: () {
                         setState(() {
                           _numInverters++;
-                          _pagesList[1] = PgCadastroProjetoPage2(
+                          _pagesList[ProjectPages.kit.index] = PgCadastroProjetoKit(
                             numInverters: _numInverters,
                             numModules: _numModules,
                           );
@@ -90,7 +111,7 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
                       onPressed: () {
                         setState(() {
                           _numModules++;
-                          _pagesList[1] = PgCadastroProjetoPage2(
+                          _pagesList[ProjectPages.kit.index] = PgCadastroProjetoKit(
                             numInverters: _numInverters,
                             numModules: _numModules,
                           );
@@ -98,30 +119,31 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
                       },
                     )
                   ])
-            : _selectedPage == 2
+            : _selectedPage == ProjectPages.contas.index
                 ? FloatingActionButton(
-                          heroTag: 'hero3',
-                          child: Icon(Icons.add),
-                          onPressed: () {
-                            setState(() {
-                              _numContas++;
-                              _pagesList[2] = PgCadastroProjetoPage3(
-                                numContas: _numContas,
-                              );
-                            });
-                          },
-                        )
+                    heroTag: 'hero3',
+                    child: Icon(Icons.add),
+                    onPressed: () {
+                      setState(() {
+                        _numContas++;
+                        _pagesList[ProjectPages.contas.index] = PgCadastroProjetoContas(
+                          numContas: _numContas,
+                        );
+                      });
+                    },
+                  )
                 : SizedBox.shrink(),
         bottomNavigationBar: BottomNavigationBar(
           items: const [
             BottomNavigationBarItem(
                 icon: Icon(Icons.contact_phone), label: 'Dados'),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'End'),
             BottomNavigationBarItem(icon: Icon(Icons.roofing), label: 'Kit'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.receipt_long), label: 'Contas'),
             BottomNavigationBarItem(icon: Icon(Icons.paid), label: 'Pag'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.description), label: 'Docs')
+                icon: Icon(Icons.description), label: 'Docs'),
           ],
           currentIndex: _selectedPage,
           onTap: (value) {
@@ -134,10 +156,10 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
           selectedFontSize: 13,
           iconSize: 25,
           unselectedFontSize: 11,
-          selectedLabelStyle: TextStyle(
+          selectedLabelStyle: const TextStyle(
             overflow: TextOverflow.visible,
           ),
-          unselectedLabelStyle: TextStyle(overflow: TextOverflow.visible),
+          unselectedLabelStyle: const TextStyle(overflow: TextOverflow.visible),
         ));
   }
 }

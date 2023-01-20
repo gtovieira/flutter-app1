@@ -3,7 +3,7 @@ import 'package:flutter_application_1/ClientData.dart';
 import 'dart:io';
 
 import 'package:flutter_application_1/main.dart';
-import 'package:flutter_application_1/pages/PgCadastroProjetoPage2.dart';
+import 'package:flutter_application_1/pages/PgCadastroProjetoKit.dart';
 
 enum tipoEstrutura { metalico, fibrocimento, solo, ceramico, laje, carport }
 
@@ -61,8 +61,6 @@ class Estrutura {
   }
 }
 
-
-
 class Conta extends Object {
   String? contaContrato, titular, cpf, cnpj;
   num? porcentagem;
@@ -91,20 +89,30 @@ class ProjectData extends Object {
       formaPagamento,
       detalhePagamento,
       nfNome,
+      nfRazaoSocial,
       nfCpf,
       nfCnpj,
       nfEndereco,
+      nfNumero,
+      nfBairro,
+      nfCidade,
       nfCep,
+      nfUf,
       nfObs;
   late DateTime dataFechamento;
   late double lat, long, preco;
-  bool? contaContratoExistente, enviaCreditos, trocaTitularidade;
-  File? cnh, fotoFachada, procuracao;
+  bool? contaContratoExistente, enviaCreditos;
+  File? identidade, fotoFachada, procuracao;
+  List<Inverter> selectedInverterList = [];
+  List<int> inverterQty = [];
+  List<Module> selectedModuleList = [];
+  List<int> moduleQty = [];
+  late double potenciaAc;
+  late double potenciaDc;
 
   ProjectData();
 
   List<String> invertersListAsString = [];
-  
 
   Future getInvertersAsString() async {
     CollectionReference inverters = firestore.collection('inverters');
@@ -139,6 +147,8 @@ class ProjectData extends Object {
   }
 
   Future getModules() async {
+    List<Module> moduleList = [];
+
     CollectionReference modules = firestore.collection('modules');
     QuerySnapshot snapshot = await modules.get();
     Map<String, dynamic> data;
@@ -150,7 +160,7 @@ class ProjectData extends Object {
           potencia: data['potencia'],
           fabricante: data['fabricante']);
       moduleList.add(mod);
-    });
+    }); 
     return moduleList;
   }
 
