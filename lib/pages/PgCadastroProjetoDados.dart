@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/ClientData.dart';
+// import 'package:flutter_application_1/Client.dart';
 import 'package:flutter_application_1/ProjectData.dart';
 import '../ApiCalls.dart';
 import '../Masks.dart';
 import '../regex.dart';
 import 'PgCadastroProjeto.dart';
-
-// final formCadProjPg1Key = GlobalKey<FormState>();
+import '../Client.dart';
 
 Future<void> _invalidCnpjDialog(BuildContext context) async {
   return showDialog<void>(
@@ -53,22 +52,24 @@ const List<String> vendors = [
   'Ricardo Sanches'
 ];
 
-ClientData clients = ClientData();
-late List<String> clientList = [];
+// Client _selectedClient = Client();
+List<Client> _clientList = [];
 
-Future<List<String>> retrieveClients() async {
-  if (clientList.isEmpty) {
+Future<List<Client>> retrieveClients() async {
+  if (_clientList.isEmpty) {
     try {
-      return clientList = await clients.getData();
+      _clientList = await Client.getData();
+      return _clientList;
     } catch (error) {
       print(error);
     }
   }
-  return clientList;
+  return _clientList;
 }
 
 class PgCadastroProjetoDados extends StatefulWidget {
-  const PgCadastroProjetoDados({super.key});
+  
+  const PgCadastroProjetoDados({super.key, required});
 
   @override
   State<PgCadastroProjetoDados> createState() => _PgCadastroProjetoDadosState();
@@ -106,7 +107,6 @@ class _PgCadastroProjetoDadosState extends State<PgCadastroProjetoDados> {
 
   @override
   void initState() {
-    // TODO: implement initState
     retrieveClients();
     super.initState();
   }
@@ -137,180 +137,74 @@ class _PgCadastroProjetoDadosState extends State<PgCadastroProjetoDados> {
             child: Form(
                 key: formKeys[ProjectPages.dados.index],
                 autovalidateMode: AutovalidateMode.always,
-                child: ListView(children: [
-                  const Text(
-                    'Selecione o Cliente:',
-                    textScaleFactor: 1.1,
-                  ),
-                  Wrap(runSpacing: 30, children: <Widget>[
-                    Autocomplete<String>(
-                      optionsBuilder: ((textEditingValue) {
-                        if (textEditingValue.text == '') {
-                          return const Iterable.empty();
-                        }
-                        return clientList.where((element) {
-                          return element
-                              .toLowerCase()
-                              .contains(textEditingValue.text.toLowerCase());
-                        });
-                      }),
-                      onSelected: (option) {
-                        print(option);
-                      },
+                child: AbsorbPointer(
+                  absorbing: ,
+                  child: ListView(children: [
+                    const Text(
+                      'Selecione o Cliente:',
+                      textScaleFactor: 1.1,
                     ),
-                    DropdownButtonFormField(
-                        decoration: InputDecoration(labelText: 'Vendedor'),
-                        items: vendors
-                            .map((e) =>
-                                DropdownMenuItem(value: e, child: Text(e)))
-                            .toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedVendor = value!;
+                    Wrap(runSpacing: 30, children: <Widget>[
+                      Autocomplete<Client>(
+                        initialValue: TextEditingValue(
+                            text: selectedClientMain.nome ??= ''),
+                        displayStringForOption: (Client option) {
+                          return option.toString();
+                        },
+                        optionsBuilder: ((textEditingValue) {
+                          if (textEditingValue.text == '') {
+                            return const Iterable<Client>.empty();
+                          }
+                          return _clientList.where((Client element) {
+                            return element
+                                .toString()
+                                .toLowerCase()
+                                .contains(textEditingValue.text.toLowerCase());
                           });
                         }),
-                    Center(
-                      child: ToggleButtons(
-                        isSelected: _contaContrato,
-                        onPressed: (index) {
-                          setState(() {
-                            for (int i = 0; i < _contaContrato.length; i++) {
-                              _contaContrato[i] = i == index;
-                            }
-                          });
+                        onSelected: (option) {
+                          selectedClientMain = option;
                         },
-                        borderRadius: BorderRadius.circular(8),
-                        fillColor: Color.fromARGB(255, 91, 161, 87),
-                        color: Color.fromARGB(255, 91, 161, 87),
-                        selectedColor: Colors.white,
-                        textStyle: TextStyle(fontSize: 13),
-                        constraints:
-                            BoxConstraints(minHeight: 50, minWidth: 165),
-                        children: _contaContratoList,
                       ),
-                    ),
-                    _contaContrato[0]
-                        ? TextFormField(
-                            decoration: const InputDecoration(
-                                labelText: 'Conta Contrato*'),
-                            onSaved: (newValue) =>
-                                project.contaContrato = newValue,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Campo Obrigatório';
-                              } else {
-                                return null;
+                      DropdownButtonFormField(
+                          value: 'Gabriel Vieira',
+                          decoration: InputDecoration(labelText: 'Vendedor'),
+                          items: vendors
+                              .map((e) =>
+                                  DropdownMenuItem(value: e, child: Text(e)))
+                              .toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedClientMain.vendedor = value!;
+                            });
+                          }),
+                      Center(
+                        child: ToggleButtons(
+                          isSelected: _contaContrato,
+                          onPressed: (index) {
+                            setState(() {
+                              for (int i = 0; i < _contaContrato.length; i++) {
+                                _contaContrato[i] = i == index;
                               }
-                            },
-                          )
-                        : SizedBox.shrink(),
-                    Wrap(runSpacing: 30, children: [
-                      TextFormField(
-                        decoration: const InputDecoration(
-                            labelText: 'Código do Projeto*'),
-                        onSaved: (newValue) => project.codProjeto = newValue,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Campo Obrigatório';
-                          } else {
-                            return null;
-                          }
-                        },
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(8),
+                          fillColor: Color.fromARGB(255, 91, 161, 87),
+                          color: Color.fromARGB(255, 91, 161, 87),
+                          selectedColor: Colors.white,
+                          textStyle: TextStyle(fontSize: 13),
+                          constraints:
+                              BoxConstraints(minHeight: 50, minWidth: 165),
+                          children: _contaContratoList,
+                        ),
                       ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                            labelText: 'Nome identificador do projeto'),
-                      ),
-                    ]),
-                    Center(
-                      child: ToggleButtons(
-                        isSelected: _mesmoTitular,
-                        onPressed: (index) {
-                          setState(() {
-                            for (int i = 0; i < _mesmoTitular.length; i++) {
-                              _mesmoTitular[i] = i == index;
-                            }
-                          });
-                        },
-                        borderRadius: BorderRadius.circular(8),
-                        fillColor: Color.fromARGB(255, 91, 161, 87),
-                        color: Color.fromARGB(255, 91, 161, 87),
-                        selectedColor: Colors.white,
-                        textStyle: TextStyle(fontSize: 18),
-                        constraints:
-                            BoxConstraints(minHeight: 50, minWidth: 165),
-                        children: _mesmoTitularList,
-                      ),
-                    ),
-                    _mesmoTitular[1]
-                        ? Column(children: [
-                            ToggleButtons(
-                              isSelected: _pfPjSelected,
-                              onPressed: (index) {
-                                setState(() {
-                                  for (int i = 0;
-                                      i < _pfPjSelected.length;
-                                      i++) {
-                                    _pfPjSelected[i] = i == index;
-                                  }
-                                });
-                              },
-                              borderRadius: BorderRadius.circular(8),
-                              fillColor: Color.fromARGB(255, 91, 161, 87),
-                              color: Color.fromARGB(255, 91, 161, 87),
-                              selectedColor: Colors.white,
-                              textStyle: TextStyle(fontSize: 18),
-                              constraints: const BoxConstraints(
-                                  minHeight: 50, minWidth: 165),
-                              children: pfPjList,
-                            ),
-                            _pfPjSelected[1]
-                                ? Focus(
-                                    onFocusChange: ((value) {
-                                      if (!value && _cnpjValidated) {
-                                        fetchCnpj();
-                                      }
-                                    }),
-                                    child: TextFormField(
-                                      decoration:
-                                          InputDecoration(labelText: 'CNPJ'),
-                                      onSaved: (newValue) =>
-                                          project.cnpj = newValue,
-                                      inputFormatters: [Masks.cnpjMask],
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          _cnpjValidated = false;
-                                          return 'Campo Obrigatório';
-                                        } else if (!RegexCodes.cnpj
-                                            .hasMatch(value)) {
-                                          _cnpjValidated = false;
-                                          return 'CNPJ inválido';
-                                        } else {
-                                          _cnpjValidated = true;
-                                          return null;
-                                        }
-                                      },
-                                    ),
-                                  )
-                                : SizedBox.shrink(),
-                            _pfPjSelected[1]
-                                ? TextFormField(
-                                    decoration: InputDecoration(
-                                        labelText: 'Razão Social'),
-                                    controller: razaoController,
-                                    onSaved: (newValue) =>
-                                        project.razaoSocial = newValue,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Campo Obrigatório';
-                                      } else {
-                                        return null;
-                                      }
-                                    },
-                                  )
-                                : SizedBox.shrink(),
-                            TextFormField(
-                              onSaved: (newValue) => project.nome = newValue,
+                      _contaContrato[0]
+                          ? TextFormField(
+                              enabled: !widget.isFormAlreadySaved,
+                              decoration: const InputDecoration(
+                                  labelText: 'Conta Contrato*'),
+                              onSaved: (newValue) =>
+                                  project.contaContrato = newValue,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Campo Obrigatório';
@@ -318,30 +212,147 @@ class _PgCadastroProjetoDadosState extends State<PgCadastroProjetoDados> {
                                   return null;
                                 }
                               },
-                              decoration: _pfPjSelected[1]
-                                  ? const InputDecoration(
-                                      labelText: 'Nome do Responsável')
-                                  : const InputDecoration(
-                                      labelText: 'Nome Completo do Titular'),
-                            ),
-                            TextFormField(
-                              decoration:
-                                  const InputDecoration(labelText: 'CPF'),
-                              onSaved: (newValue) => project.cpf = newValue,
-                              inputFormatters: [Masks.cpfMask],
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Campo obrigatório';
-                                } else if (!RegexCodes.cpf.hasMatch(value)) {
-                                  return 'Digite um CPF válido';
-                                } else {
-                                  return null;
-                                }
-                              },
-                            ),
-                          ])
-                        : SizedBox.shrink(),
-                  ])
-                ]))));
+                            )
+                          : SizedBox.shrink(),
+                      Wrap(runSpacing: 30, children: [
+                        TextFormField(
+                          decoration: const InputDecoration(
+                              labelText: 'Código do Projeto*'),
+                          onSaved: (newValue) => project.codProjeto = newValue,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Campo Obrigatório';
+                            } else {
+                              return null;
+                            }
+                          },
+                        ),
+                        TextFormField(
+                          decoration: InputDecoration(
+                              labelText: 'Nome identificador do projeto'),
+                        ),
+                      ]),
+                      Center(
+                        child: ToggleButtons(
+                          isSelected: _mesmoTitular,
+                          onPressed: (index) {
+                            setState(() {
+                              for (int i = 0; i < _mesmoTitular.length; i++) {
+                                _mesmoTitular[i] = i == index;
+                              }
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(8),
+                          fillColor: Color.fromARGB(255, 91, 161, 87),
+                          color: Color.fromARGB(255, 91, 161, 87),
+                          selectedColor: Colors.white,
+                          textStyle: TextStyle(fontSize: 18),
+                          constraints:
+                              BoxConstraints(minHeight: 50, minWidth: 165),
+                          children: _mesmoTitularList,
+                        ),
+                      ),
+                      _mesmoTitular[1]
+                          ? Wrap(runSpacing: 30, children: [
+                              ToggleButtons(
+                                isSelected: _pfPjSelected,
+                                onPressed: (index) {
+                                  setState(() {
+                                    for (int i = 0;
+                                        i < _pfPjSelected.length;
+                                        i++) {
+                                      _pfPjSelected[i] = i == index;
+                                    }
+                                  });
+                                },
+                                borderRadius: BorderRadius.circular(8),
+                                fillColor: Color.fromARGB(255, 91, 161, 87),
+                                color: Color.fromARGB(255, 91, 161, 87),
+                                selectedColor: Colors.white,
+                                textStyle: TextStyle(fontSize: 18),
+                                constraints: const BoxConstraints(
+                                    minHeight: 50, minWidth: 165),
+                                children: pfPjList,
+                              ),
+                              _pfPjSelected[1]
+                                  ? Focus(
+                                      onFocusChange: ((value) {
+                                        if (!value && _cnpjValidated) {
+                                          fetchCnpj();
+                                        }
+                                      }),
+                                      child: TextFormField(
+                                        decoration:
+                                            InputDecoration(labelText: 'CNPJ'),
+                                        onSaved: (newValue) =>
+                                            project.cnpj = newValue,
+                                        inputFormatters: [Masks.cnpjMask],
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            _cnpjValidated = false;
+                                            return 'Campo Obrigatório';
+                                          } else if (!RegexCodes.cnpj
+                                              .hasMatch(value)) {
+                                            _cnpjValidated = false;
+                                            return 'CNPJ inválido';
+                                          } else {
+                                            _cnpjValidated = true;
+                                            return null;
+                                          }
+                                        },
+                                      ),
+                                    )
+                                  : SizedBox.shrink(),
+                              _pfPjSelected[1]
+                                  ? TextFormField(
+                                      decoration: InputDecoration(
+                                          labelText: 'Razão Social'),
+                                      controller: razaoController,
+                                      onSaved: (newValue) =>
+                                          project.razaoSocial = newValue,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Campo Obrigatório';
+                                        } else {
+                                          return null;
+                                        }
+                                      },
+                                    )
+                                  : SizedBox.shrink(),
+                              TextFormField(
+                                onSaved: (newValue) => project.nome = newValue,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Campo Obrigatório';
+                                  } else {
+                                    return null;
+                                  }
+                                },
+                                decoration: _pfPjSelected[1]
+                                    ? const InputDecoration(
+                                        labelText: 'Nome do Responsável')
+                                    : const InputDecoration(
+                                        labelText: 'Nome Completo do Titular'),
+                              ),
+                              TextFormField(
+                                decoration:
+                                    const InputDecoration(labelText: 'CPF'),
+                                onSaved: (newValue) => project.cpf = newValue,
+                                inputFormatters: [Masks.cpfMask],
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Campo obrigatório';
+                                  } else if (!RegexCodes.cpf.hasMatch(value)) {
+                                    return 'Digite um CPF válido';
+                                  } else {
+                                    return null;
+                                  }
+                                },
+                              ),
+                            ])
+                          : SizedBox.shrink(),
+                    ])
+                  ]),
+                ))));
   }
 }

@@ -7,14 +7,13 @@ import 'package:flutter_application_1/pages/PgCadastroProjetoKit.dart';
 import 'package:flutter_application_1/pages/PgCadastroProjetoContas.dart';
 import 'package:flutter_application_1/pages/PgCadastroProjetoPag.dart';
 import 'package:flutter_application_1/pages/PgCadastroProjetoDocs.dart';
+import '../Client.dart';
 // import './PgCadastroProjetoPage1.dart';
 
-ProjectData project = ProjectData();
 
 enum ProjectPages { dados, end, kit, contas, pag, docs }
 
 List<GlobalKey<FormState>> formKeys = [];
-List<bool> formValidated = [false, false, false, false, false, false];
 
 class PgCadastroProjeto extends StatefulWidget {
   const PgCadastroProjeto({super.key});
@@ -58,7 +57,10 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
               const Expanded(flex: 2, child: Text('Adicionar Projeto')),
               IconButton(
                   onPressed: () {
-                    // _formCadProjKey.currentState!.reset();
+                    formKeys[_selectedPage].currentState!.reset();
+                    setState(() {
+                      // projectFormValidated[_selectedPage] = false;
+                    });
                   },
                   icon: const Icon(Icons.backspace)),
               IconButton(
@@ -66,16 +68,16 @@ class _PgCadastroProjetoState extends State<PgCadastroProjeto> {
                   if (formKeys[_selectedPage].currentState!.validate()) {
                     formKeys[_selectedPage].currentState!.save();
                     setState(() {
-                      formValidated[_selectedPage] = true;
+                      // projectFormValidated[_selectedPage] = true;
                     });
                     // project.sendData();
                     // Navigator.pushNamed(context, '/');
                   }
                 },
-                icon: formValidated[_selectedPage]
+                icon: projectFormValidated[_selectedPage]
                     ? const Icon(Icons.check_circle)
                     : const Icon(Icons.save),
-                color: formValidated[_selectedPage]
+                color: projectFormValidated[_selectedPage]
                     ? Colors.green[900]
                     : Colors.red[900],
               )
